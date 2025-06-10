@@ -1,65 +1,106 @@
 import 'package:flutter/material.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(const MinimalIniziativeTrackerApp());
 }
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+class Creature {
+  Creature(this.name, this.initiative);
+
+  final String name;
+  final int initiative;
+}
+
+class MinimalIniziativeTrackerApp extends StatelessWidget {
+  const MinimalIniziativeTrackerApp({super.key});
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-      ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
+      title: 'Minimal Iniziative Tracker',
+      theme: ThemeData(primarySwatch: Colors.blue),
+      home: const IniziativeTrackerPage(),
     );
   }
 }
 
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
-
-  final String title;
+class IniziativeTrackerPage extends StatefulWidget {
+  const IniziativeTrackerPage({super.key});
 
   @override
-  State<MyHomePage> createState() => _MyHomePageState();
+  State<IniziativeTrackerPage> createState() => _IniziativeTrackerPageState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
+class _IniziativeTrackerPageState extends State<IniziativeTrackerPage> {
+  final List<Creature> _creatures = [];
 
-  void _incrementCounter() {
-    setState(() {
-      _counter++;
-    });
+  void _showAddDialog() {
+    final nameController = TextEditingController();
+    final initiativeController = TextEditingController();
+
+    showDialog<void>(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('Aggiungi Creatura'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: nameController,
+                decoration: const InputDecoration(labelText: 'Nome'),
+              ),
+              TextField(
+                controller: initiativeController,
+                keyboardType: TextInputType.number,
+                decoration: const InputDecoration(labelText: 'Iniziativa'),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text('Annulla'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                final name = nameController.text.trim();
+                final initiative = int.tryParse(initiativeController.text.trim());
+                if (name.isNotEmpty && initiative != null) {
+                  setState(() {
+                    _creatures.add(Creature(name, initiative));
+                    _creatures.sort(
+                        (a, b) => b.initiative.compareTo(a.initiative));
+                  });
+                }
+                Navigator.of(context).pop();
+              },
+              child: const Text('Aggiungi'),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.title),
+        title: const Text('Minimal Iniziative Tracker'),
       ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            const Text(
-              'You have pushed the button this many times:',
-            ),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headlineMedium,
-            ),
-          ],
-        ),
+      body: ListView.builder(
+        itemCount: _creatures.length,
+        itemBuilder: (context, index) {
+          final creature = _creatures[index];
+          return ListTile(
+            title: Text(creature.name),
+            trailing: Text(creature.initiative.toString()),
+          );
+        },
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
+        onPressed: _showAddDialog,
         child: const Icon(Icons.add),
       ),
     );
