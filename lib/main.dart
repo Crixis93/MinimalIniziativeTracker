@@ -1,142 +1,66 @@
 import 'package:flutter/material.dart';
 
 void main() {
-  runApp(const InitiativeTrackerApp());
+  runApp(const MyApp());
 }
 
-class InitiativeTrackerApp extends StatelessWidget {
-  const InitiativeTrackerApp({super.key});
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Initiative Tracker',
-      theme: ThemeData(primarySwatch: Colors.blue),
-      home: const InitiativePage(),
+      title: 'Flutter Demo',
+      theme: ThemeData(
+        primarySwatch: Colors.blue,
+      ),
+      home: const MyHomePage(title: 'Flutter Demo Home Page'),
     );
   }
 }
 
-class InitiativeEntry {
-  String name;
-  int initiative;
+class MyHomePage extends StatefulWidget {
+  const MyHomePage({super.key, required this.title});
 
-  InitiativeEntry({required this.name, required this.initiative});
-}
-
-class InitiativePage extends StatefulWidget {
-  const InitiativePage({super.key});
+  final String title;
 
   @override
-  State<InitiativePage> createState() => _InitiativePageState();
+  State<MyHomePage> createState() => _MyHomePageState();
 }
 
-class _InitiativePageState extends State<InitiativePage> {
-  final List<InitiativeEntry> _entries = [];
-  final TextEditingController _nameController = TextEditingController();
-  final TextEditingController _initController = TextEditingController();
+class _MyHomePageState extends State<MyHomePage> {
+  int _counter = 0;
 
-  void _addEntry() {
-    final name = _nameController.text.trim();
-    final initiative = int.tryParse(_initController.text.trim());
-    if (name.isEmpty || initiative == null) return;
-
+  void _incrementCounter() {
     setState(() {
-      _entries.add(InitiativeEntry(name: name, initiative: initiative));
-      _nameController.clear();
-      _initController.clear();
+      _counter++;
     });
-  }
-
-  void _editEntry(int index) {
-    final entry = _entries[index];
-    final editNameController = TextEditingController(text: entry.name);
-    final editInitController =
-        TextEditingController(text: entry.initiative.toString());
-
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Modifica elemento'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            TextField(
-              controller: editNameController,
-              decoration: const InputDecoration(labelText: 'Nome'),
-            ),
-            TextField(
-              controller: editInitController,
-              decoration: const InputDecoration(labelText: 'Iniziativa'),
-              keyboardType: TextInputType.number,
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Annulla'),
-          ),
-          TextButton(
-            onPressed: () {
-              final newName = editNameController.text.trim();
-              final newInit = int.tryParse(editInitController.text.trim());
-              if (newName.isNotEmpty && newInit != null) {
-                setState(() {
-                  entry.name = newName;
-                  entry.initiative = newInit;
-                });
-                Navigator.pop(context);
-              }
-            },
-            child: const Text('Salva'),
-          ),
-        ],
-      ),
-    );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Initiative Tracker')),
-      body: Padding(
-        padding: const EdgeInsets.all(16),
+      appBar: AppBar(
+        title: Text(widget.title),
+      ),
+      body: Center(
         child: Column(
-          children: [
-            TextField(
-              controller: _nameController,
-              decoration: const InputDecoration(labelText: 'Nome'),
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            const Text(
+              'You have pushed the button this many times:',
             ),
-            TextField(
-              controller: _initController,
-              decoration: const InputDecoration(labelText: 'Iniziativa'),
-              keyboardType: TextInputType.number,
-            ),
-            const SizedBox(height: 8),
-            ElevatedButton(
-              onPressed: _addEntry,
-              child: const Text('Aggiungi'),
-            ),
-            const SizedBox(height: 16),
-            Expanded(
-              child: ListView.builder(
-                itemCount: _entries.length,
-                itemBuilder: (context, index) {
-                  final entry = _entries[index];
-                  return ListTile(
-                    title: Text(entry.name),
-                    subtitle: Text('Iniziativa: ${entry.initiative}'),
-                    trailing: IconButton(
-                      icon: const Icon(Icons.edit),
-                      onPressed: () => _editEntry(index),
-                    ),
-                  );
-                },
-              ),
+            Text(
+              '$_counter',
+              style: Theme.of(context).textTheme.headlineMedium,
             ),
           ],
         ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: _incrementCounter,
+        tooltip: 'Increment',
+        child: const Icon(Icons.add),
       ),
     );
   }
