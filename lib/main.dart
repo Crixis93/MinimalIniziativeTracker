@@ -36,6 +36,12 @@ class _InitiativePageState extends State<InitiativePage> {
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _initController = TextEditingController();
 
+  void _sortEntries() {
+    _entries.sort(
+      (a, b) => b.initiative.compareTo(a.initiative),
+    );
+  }
+
   void _addEntry() {
     final name = _nameController.text.trim();
     final initiative = int.tryParse(_initController.text.trim());
@@ -43,6 +49,7 @@ class _InitiativePageState extends State<InitiativePage> {
 
     setState(() {
       _entries.add(InitiativeEntry(name: name, initiative: initiative));
+      _sortEntries();
       _nameController.clear();
       _initController.clear();
     });
@@ -85,6 +92,7 @@ class _InitiativePageState extends State<InitiativePage> {
                 setState(() {
                   entry.name = newName;
                   entry.initiative = newInit;
+                  _sortEntries();
                 });
                 Navigator.pop(context);
               }
